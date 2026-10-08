@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 90" width="380" height="90">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&amp;display=swap');
+      .facade-text {
+        font-family: 'Fraunces', Georgia, serif;
+        font-weight: 800;
+        font-size: 44px;
+        letter-spacing: 0.14em;
+        fill: #334D40;
+      }
+      .facade-shadow {
+        font-family: 'Fraunces', Georgia, serif;
+        font-weight: 800;
+        font-size: 44px;
+        letter-spacing: 0.14em;
+        fill: #C6D8C8;
+      }
+      .facade-sub {
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 9.5px;
+        letter-spacing: 0.32em;
+        fill: #C85A32;
+        text-transform: uppercase;
+      }
+      .facade-location {
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        font-weight: 600;
+        font-size: 9px;
+        letter-spacing: 0.18em;
+        fill: #61776C;
+        text-transform: uppercase;
+      }
+    </style>
+  </defs>
+
+  <!-- Ombre portée douce comme sur l'enseigne en relief -->
+  <text x="6" y="52" class="facade-shadow">MANOFICA</text>
+  <!-- Lettres principales vert bouteille / sauge de la devanture -->
+  <text x="4" y="50" class="facade-text">MANOFICA</text>
+
+  <!-- Sous-titre Trattoria & Localisation Quai Cronstadt -->
+  <text x="6" y="69" class="facade-sub">TRATTORIA · PIZZERIA</text>
+  <text x="6" y="82" class="facade-location">304 QUAI CRONSTADT · PORT DE TOULON</text>
+</svg>
