@@ -112,16 +112,26 @@
   }
 
   // 5. Gestion adaptative de la Galerie (2 colonnes sur mobile, 3 sur desktop, 4 sur grand écran)
+  // Galerie Masonry 3D & Mobile Story Swipe
   const galleryFlex = document.getElementById('galleryMasonry');
+  const galleryCounter = document.getElementById('galleryCounter');
   if (galleryFlex) {
     const allGalleryItems = Array.from(galleryFlex.querySelectorAll('.gallery-masonry-item'));
-    let activeColumnCount = -1;
+    let activeMode = '';
 
     function initTilt() {
       const isTouchDevice = window.matchMedia('(hover: none), (pointer: coarse)').matches;
-      if (isTouchDevice) return;
+      if (isTouchDevice) {
+        galleryFlex.querySelectorAll('.gallery-card-3d').forEach(card => {
+          card.style.transform = '';
+          card.onmousemove = null;
+          card.onmouseenter = null;
+          card.onmouseleave = null;
+        });
+        return;
+      }
 
-      const masonryCards = document.querySelectorAll('.gallery-card-3d');
+      const masonryCards = galleryFlex.querySelectorAll('.gallery-card-3d');
       masonryCards.forEach(card => {
         let bounds = null;
         let targetRotX = 0;
@@ -156,8 +166,8 @@
           const normX = (mouseX / bounds.width) - 0.5;
           const normY = (mouseY / bounds.height) - 0.5;
 
-          targetRotX = -normY * 16;
-          targetRotY = normX * 16;
+          targetRotX = -normY * 14;
+          targetRotY = normX * 14;
 
           if (!rafId) {
             rafId = requestAnimationFrame(updateSpring);
@@ -175,40 +185,70 @@
       });
     }
 
-    function updateGalleryColumns() {
+    function layoutGallery() {
       const width = window.innerWidth;
-      let targetColumns = 2; // Sur smartphone : 2 colonnes côte-à-côte (Masonry tactile Pinterest)
-      if (width >= 1200) {
-        targetColumns = 4;
-      } else if (width >= 768) {
-        targetColumns = 3;
+
+      if (width < 768) {
+        if (activeMode === 'mobile') return;
+        activeMode = 'mobile';
+        galleryFlex.innerHTML = '';
+        allGalleryItems.forEach(item => {
+          galleryFlex.appendChild(item);
+        });
+        initTilt();
+      } else if (width < 1024) {
+        if (activeMode === 'tablet') return;
+        activeMode = 'tablet';
+        galleryFlex.innerHTML = '';
+        const col1 = document.createElement('div');
+        col1.className = 'gallery-masonry-col';
+        const col2 = document.createElement('div');
+        col2.className = 'gallery-masonry-col';
+
+        allGalleryItems.slice(0, 8).forEach(item => col1.appendChild(item));
+        allGalleryItems.slice(8, 16).forEach(item => col2.appendChild(item));
+
+        galleryFlex.appendChild(col1);
+        galleryFlex.appendChild(col2);
+        initTilt();
+      } else {
+        if (activeMode === 'desktop') return;
+        activeMode = 'desktop';
+        galleryFlex.innerHTML = '';
+        const cols = [];
+        for (let i = 0; i < 4; i++) {
+          const col = document.createElement('div');
+          col.className = 'gallery-masonry-col';
+          cols.push(col);
+          galleryFlex.appendChild(col);
+        }
+
+        cols[0].append(...allGalleryItems.slice(0, 4));
+        cols[1].append(...allGalleryItems.slice(4, 8));
+        cols[2].append(...allGalleryItems.slice(8, 12));
+        cols[3].append(...allGalleryItems.slice(12, 16));
+        initTilt();
       }
-
-      if (targetColumns === activeColumnCount) return;
-      activeColumnCount = targetColumns;
-
-      galleryFlex.innerHTML = '';
-      const cols = [];
-      for (let i = 0; i < targetColumns; i++) {
-        const col = document.createElement('div');
-        col.className = 'gallery-masonry-col';
-        cols.push(col);
-        galleryFlex.appendChild(col);
-      }
-
-      allGalleryItems.forEach((item, index) => {
-        cols[index % targetColumns].appendChild(item);
-      });
-
-      initTilt();
     }
 
-    updateGalleryColumns();
+    // Indicateur de swipe story tactile sur mobile
+    if (galleryCounter) {
+      galleryFlex.addEventListener('scroll', () => {
+        if (window.innerWidth >= 768) return;
+        const scrollLeft = galleryFlex.scrollLeft;
+        const firstCard = galleryFlex.querySelector('.gallery-masonry-item');
+        const cardWidth = (firstCard ? firstCard.offsetWidth : 300) + 16;
+        const currentIdx = Math.min(allGalleryItems.length, Math.max(1, Math.round(scrollLeft / cardWidth) + 1));
+        galleryCounter.textContent = `Glisser pour explorer · ${currentIdx} / ${allGalleryItems.length}`;
+      }, { passive: true });
+    }
+
+    layoutGallery();
 
     let resizeDebounce;
     window.addEventListener('resize', () => {
       clearTimeout(resizeDebounce);
-      resizeDebounce = setTimeout(updateGalleryColumns, 120);
+      resizeDebounce = setTimeout(layoutGallery, 100);
     }, { passive: true });
   }
 
